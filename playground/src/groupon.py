@@ -24,6 +24,7 @@ class GrouponGui:
     def __init__(self, master):
         frame = Frame(master)
         frame.grid(padx=10, pady=10)
+        
         #frame.grid_rowconfigure(0, weight=1)
         #frame.grid_columnconfigure(0, weight=1)
         #yscrollbar = Scrollbar(frame)
