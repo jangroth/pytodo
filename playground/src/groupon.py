@@ -8,10 +8,37 @@
 
 import urllib2
 import os
+import webbrowser
 from Tkinter import *
+from time import localtime, strftime
 
-# global data store
+# global data lists
 grouponDataList = []
+swissData = { "Basel": ["http://www.groupon.ch/deals/basel", "basel"], 
+			  "Bern" : ["http://www.groupon.ch/deals/bern", "bern"], 
+			  "Biel" : ["http://www.groupon.ch/deals/biel", "biel"],
+			  "Chur" : ["http://www.groupon.ch/deals/chur", "chur"],
+			  "Freiburg" : ["http://www.groupon.ch/deals/freiburg", "freiburg"],
+			  "Genf" : ["http://www.groupon.ch/deals/genf", "genf"],
+			  "Groupon Travel" : ["http://www.groupon.ch/deals/groupon-travel", "groupon-travel"],
+			  "Interlaken" : ["http://www.groupon.ch/deals/interlaken", "interlaken"],
+			  "Koenitz" : ["http://www.groupon.ch/deals/koenitz", "koenitz"],
+			  "La-Chaux-de-Fonds" : ["http://www.groupon.ch/deals/la-chaux-de-fonds", "la-chaux-de-fonds"],
+			  "Lausanne" : ["http://www.groupon.ch/deals/lausanne", "lausanne"],
+			  "Luzern" : ["http://www.groupon.ch/deals/luzern", "luzern"],
+			  "Neuenburg" : ["http://www.groupon.ch/deals/neuenburg", "neuenburg"],
+			  "Schaffhausen" : ["http://www.groupon.ch/deals/schaffhausen", "schaffhausen"],
+			  "Sitten" : ["http://www.groupon.ch/deals/sitten", "sitten"],
+			  "St.Gallen": ["http://www.groupon.ch/deals/stgallen", "st-gallen"], 
+			  "Thun": ["http://www.groupon.ch/deals/thun", "thun"], 
+			  "Uster": ["http://www.groupon.ch/deals/uster", "uster"], 
+			  "Winterthur": ["http://www.groupon.ch/deals/winterthur", "winterthur"], 
+			  "Vernier": ["http://www.groupon.ch/deals/vernier", "vernier"], 
+			  "Zug": ["http://www.groupon.ch/deals/zug", "zug"], 
+			  "Zuerich" : ["http://www.groupon.ch/deals/zuerich", "zuerich"],
+			  "Zuerich Spezial" : ["http://www.groupon.ch/deals/zurich-spezial", "zurich-spezial"],
+			  "National Deal" : ["http://www.groupon.ch/deals/zurich-spezial", "online-deal"]
+			  }
 
 #
 # classes
@@ -20,9 +47,10 @@ grouponDataList = []
 class GrouponDataItem:
     """data structure to store relevant data"""
 	
-    def __init__(self, content, cities):
+    def __init__(self, content, cities, urls):
         self.content = content
         self.cities = cities
+        self.urls = urls
     def __repr__(self):
         return "cities: %s content: %s, \n" % (self.cities, self.content)
 
@@ -30,31 +58,30 @@ class GrouponGui:
     """tkinter-gui to display data"""
 
     def __init__(self, master):
-        frame = Frame(master, height = 300, width = 500)
-        frame.grid_propagate(False)
-        frame.grid(padx=10, pady=10)
-        
-        # frame.grid_rowconfigure(0, weight=1)
-        # frame.grid_columnconfigure(0, weight=1)
-        # yscrollbar = Scrollbar(frame)
-        # yscrollbar.grid(row=0, column=1, sticky=N+S)
-        
-        
-        # scrollbar = Scrollbar(frame)
-        # scrollbar.grid()
-        # frame.config(yscrollcommand=scrollbar.set)
-        # scrollbar.config(command=frame.yview)
+        frame = Frame(master, width = 500)
+        # frame.grid_propagate(False)
+        frame.pack(padx=10, pady=10, fill=BOTH, expand=YES)
         self.fill_table(frame)
-        
+
     def fill_table(self, frame):
-            for index, item in enumerate(grouponDataList):
-                print index, item.city, item.content
-                separator = Frame(frame, width=600, height=50, bd=1, relief=SUNKEN, padx=5, pady=5)
-                separator.grid(columnspan=4)
-                Label(separator, text = item.city, font="bold", width=15 ).grid(row = index, column=0)
-                Label(separator, text = item.content, wraplength=400, width=50, anchor=W, justify=LEFT ).grid(row = index, column=1)
-                Label(separator, text = "click", width=10).grid(row = index, column=2)
+		for index, item in enumerate(grouponDataList):
+			separator = Frame(frame, width=600, height=50, bd=1, relief=SUNKEN, padx=5, pady=5)
+			w = Text( separator, wrap='word', height=1, width=1 )
+			w.insert( 1.0, item.content )
+			w.configure( bg=separator.cget('bg'), relief='flat', state='disabled' )
+			w.pack(fill=BOTH, expand=1)
+			#Label(separator, text = item.content, justify=CENTER).pack(fill=BOTH, expand=YES)
+			for index, city in enumerate(item.cities):
+				Button(separator, text=city, command=lambda url = item.urls[index]: self.callback(url)).pack(side=LEFT)
+			separator.pack(fill=BOTH, expand=True)
+		finish = Frame(frame, width=600, height=50, bd=1, padx=15, pady=15)
+		Label(finish, text="fetch time: " + strftime("%a, %d %b %Y %H:%M:%S", localtime())).pack(side=LEFT)
+		Button(finish, text="update now", command=main).pack(side=RIGHT)
+		finish.pack(fill=BOTH, expand=True)
             			
+    def callback(self, url):
+    	webbrowser.open_new_tab(url)
+        
 def get_content_from_url(url, cookieCode):
     """Fetches groupon data from provided URL, sends provided cookie."""
     opener = urllib2.build_opener()
@@ -65,44 +92,37 @@ def get_content_from_url(url, cookieCode):
     headline = 'cannot determine'
     if html.count("h1") == 2:
     	headline = html[html.find("h1") + 3:html.rfind("h1") - 6]
-    	headline = headline.split(">")[1]
+    	if headline.find(">") != -1: # if nested link
+    	 	headline = headline.split(">")[1] 
     	headline = headline.replace("\n", " ")
     	headline = headline.replace("\r", " ")
     	headline = headline.replace("  ", " ")
     return headline
 
-def append_to_list(content, city):
+def append_or_merge_to_list(content, city, url):
+	""" adds or merges content to existing dictonary"""
 	global grouponDataList
 	for item in grouponDataList:
 		if item.content == content:
 			item.cities.append(city)
+			item.urls.append(url)
 			break
 	else:
-		grouponDataList.append(GrouponDataItem(content, [city]))
-	
+		grouponDataList.append(GrouponDataItem(content, [city], [url]))
 
 def fetch_data():
     """initalize global datastore"""
     global grouponDataList
-    swissData = { "Basel": ["http://www.groupon.ch/deals/basel", "basel"], 
-                  "Bern" : ["http://www.groupon.ch/deals/bern", "bern"], 
-                  "Biel" : ["http://www.groupon.ch/deals/biel", "biel"],
-                  "Chur" : ["http://www.groupon.ch/deals/chur", "chur"],
-                  "Freiburg" : ["http://www.groupon.ch/deals/freiburg", "freiburg"],
-                  "Genf" : ["http://www.groupon.ch/deals/genf", "genf"],
-                  "Groupon Travel" : ["http://www.groupon.ch/deals/groupon-travel", "groupon-travel"],
-                  "Interlaken" : ["http://www.groupon.ch/deals/interlaken", "interlaken"],
-                  "Koenitz" : ["http://www.groupon.ch/deals/koenitz", "koenitz"],
-                  "La-Chaux-de-Fonds" : ["http://www.groupon.ch/deals/la-chaux-de-fonds", "la-chaux-de-fonds"],
-                  "Lausanne" : ["http://www.groupon.ch/deals/lausanne", "lausanne"],
-                  "St.Gallen": ["http://www.groupon.ch/deals/stgallen", "st-gallen"], 
-                  "Zuerich" : ["http://www.groupon.ch/deals/zuerich", "zuerich"]}
     for city,dataList in swissData.iteritems():
-        append_to_list(get_content_from_url(dataList[0], dataList[1]), city)
+    	print "fetching %s ..." % city,
+        append_or_merge_to_list(get_content_from_url(dataList[0], dataList[1]), city, dataList[0])
+        print " ok"
+    grouponDataList.sort(key = lambda item: len(item.cities))
 
 def build_gui():
     """builds tkinter GUI."""
     root = Tk()
+    root.title("GDF - groupon data fetcher")
     app = GrouponGui(root)
     root.mainloop()
 
@@ -110,7 +130,7 @@ def main():
     """ Fetch data from various groupon cities, merge into data structure, display in GUI."""
     fetch_data()
     print grouponDataList
-    #build_gui()
+    build_gui()
         
 if __name__ == "__main__":
     main()
