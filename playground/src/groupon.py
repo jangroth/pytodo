@@ -58,29 +58,32 @@ class GrouponGui:
     """tkinter-gui to display data"""
 
     def __init__(self, master):
-        frame = Frame(master, width = 500)
-        # frame.grid_propagate(False)
+        frame = Frame(master, width = 300)
         frame.pack(padx=10, pady=10, fill=BOTH, expand=YES)
         self.fill_table(frame)
+        self.master = master
 
     def fill_table(self, frame):
 		for index, item in enumerate(grouponDataList):
-			separator = Frame(frame, width=600, height=50, bd=1, relief=SUNKEN, padx=5, pady=5)
-			w = Text( separator, wrap='word', height=1, width=1 )
+			separator = Frame(frame, bd=1, relief=SUNKEN, padx=5, pady=5)
+			w = Text( separator, wrap='word', height=2, width=1 )
 			w.insert( 1.0, item.content )
 			w.configure( bg=separator.cget('bg'), relief='flat', state='disabled' )
 			w.pack(fill=BOTH, expand=1)
-			#Label(separator, text = item.content, justify=CENTER).pack(fill=BOTH, expand=YES)
 			for index, city in enumerate(item.cities):
-				Button(separator, text=city, command=lambda url = item.urls[index]: self.callback(url)).pack(side=LEFT)
+				Button(separator, text=city, command=lambda url = item.urls[index]: self.open_url(url)).pack(side=LEFT)
 			separator.pack(fill=BOTH, expand=True)
-		finish = Frame(frame, width=600, height=50, bd=1, padx=15, pady=15)
+		finish = Frame(frame, bd=1, padx=15, pady=15)
 		Label(finish, text="fetch time: " + strftime("%a, %d %b %Y %H:%M:%S", localtime())).pack(side=LEFT)
-		Button(finish, text="update now", command=main).pack(side=RIGHT)
+		Button(finish, text="update now", command=self.refresh_gui).pack(side=RIGHT)
 		finish.pack(fill=BOTH, expand=True)
             			
-    def callback(self, url):
+    def open_url(self, url):
     	webbrowser.open_new_tab(url)
+
+    def refresh_gui(self):
+		self.master.destroy()
+		main()
         
 def get_content_from_url(url, cookieCode):
     """Fetches groupon data from provided URL, sends provided cookie."""
@@ -112,7 +115,8 @@ def append_or_merge_to_list(content, city, url):
 
 def fetch_data():
     """initalize global datastore"""
-    global grouponDataList
+    global grouponDataList 
+    grouponDataList = []
     for city,dataList in swissData.iteritems():
     	print "fetching %s ..." % city,
         append_or_merge_to_list(get_content_from_url(dataList[0], dataList[1]), city, dataList[0])
