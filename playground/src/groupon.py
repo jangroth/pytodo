@@ -7,6 +7,7 @@
 """
 
 import urllib2
+import cookielib
 import os
 import webbrowser
 from Tkinter import *
@@ -85,11 +86,11 @@ class GrouponGui:
 		self.master.destroy()
 		main()
         
-def get_content_from_url(url, cookieCode):
+def get_content_from_url(url, cookieCode, cookies):
     """Fetches groupon data from provided URL, sends provided cookie."""
     opener = urllib2.build_opener()
     opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-    opener.addheaders.append(('Cookie', "__utma=151662447.1565834492.1313527685.1313988918.1314130979.5; __utmz=151662447.1313527685.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); user_locale=de_CH; city=" + cookieCode + "; _vis_opt_s=4%7C; CID=CH_DTI_0_0_0_0; BIGipServerwww.citydeal.ch_http=3592415242.33280.0000; _vis_opt_test_cookie=1; __utmb=151662447.6.10.1314130979; __utmc=15166244"))
+    opener.addheaders.append(('Cookie', cookies + "; city=" + cookieCode))
     infile = opener.open(url)
     html = infile.read()
     headline = 'cannot determine'
@@ -116,10 +117,11 @@ def append_or_merge_to_list(content, city, url):
 def fetch_data():
     """initalize global datastore"""
     global grouponDataList 
-    grouponDataList = []
+    grouponDataList = [] # needed for refresh
+    cookies = read_cookies()
     for city,dataList in swissData.iteritems():
     	print "fetching %s ..." % city,
-        append_or_merge_to_list(get_content_from_url(dataList[0], dataList[1]), city, dataList[0])
+        append_or_merge_to_list(get_content_from_url(dataList[0], dataList[1], cookies), city, dataList[0])
         print " ok"
     grouponDataList.sort(key = lambda item: len(item.cities))
 
@@ -130,11 +132,21 @@ def build_gui():
     app = GrouponGui(root)
     root.mainloop()
 
+def read_cookies():
+	cj = cookielib.CookieJar()
+	opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+	resp = opener.open('http://www.groupon.ch')
+	result = ""
+	for cookie in cj:
+		result += cookie.name + "=" + cookie.value +"; "
+	return result;
+
 def main():
     """ Fetch data from various groupon cities, merge into data structure, display in GUI."""
+    read_cookies()
     fetch_data()
     print grouponDataList
-    build_gui()
+    # build_gui()
         
 if __name__ == "__main__":
     main()
