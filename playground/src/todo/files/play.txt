@@ -1,0 +1,19 @@
+(B) test anrufen +social @phone +_w52
+test abgeben +office @city +_w51
+test besprechen +xmas @alums +_msd
+test machen +work +mpt +_m01
+test ueben +xmas @alums +_w49
+test bezahlen +office @computer +_m02
+test einrichten +work +mpt @mendoza
+kramwumsen +_y13
+tarabsen +_y11
+(B) karte test +xmas @computer +_y12
+(A) karte test +xmas +_y14 @computer
+(A) karte test +xmas +_msd @computer
+(C) karte test +xmas @computer +_m04
+(D) karte test +xmas @computer +_m05
+(B) karte test +xmas @computer +_w04
+(B) karte test +xmas @computer +_w05
+(C) karte1 test +xmas @computer +_w06
+(B) karte1 test +xmas @computer +_w06
+karte1 test +xmas @computer +_w06
