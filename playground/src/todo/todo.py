@@ -6,10 +6,24 @@ import re
 todoVar = "TODO_DIR_PYTHON"
 todos = {'inbox':[], 'future':[], 'past':[], 'msd':[]}
 
+class Todo:
+    ''' central object '''
+    goal = ""
+    timeContext = ""
+    priority = ""
+    projects = []
+    contexts = []
+    def __init__(self, todoString):
+        self.cutProjects(todoString)
+    
+    def cutProjects(self, todoString):
+        match = re.compile(r'\@.+\s').search(todoString)
+        
+
 def getTodoPath():
     '''todo'''
     # return os.environ['TODO_DIR_PYTHON'] + "/todo.txt"
-    return "play.txt"
+    return "files/play.txt"
     
 def readDataFromFile():
     '''read data file an dispatch into dictionary'''
