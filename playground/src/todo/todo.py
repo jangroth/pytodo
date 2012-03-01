@@ -8,17 +8,22 @@ todos = {'inbox':[], 'future':[], 'past':[], 'msd':[]}
 
 class Todo:
     ''' central object '''
-    goal = ""
-    timeContext = ""
-    priority = ""
-    projects = []
-    contexts = []
     def __init__(self, todoString):
-        self.cutProjects(todoString)
-    
-    def cutProjects(self, todoString):
-        match = re.compile(r'\@.+\s').search(todoString)
+        self.goal = ""
+        self.timeContext = ""
+        self.priority = ""
+        self.projects = []
+        self.contexts = []
+        #self.cutProjects(todoString)
+        self.cutUniqueStrings(todoString, r'\+\S+', self.projects)
+        self.cutUniqueStrings(todoString, r'\@\S+', self.contexts)
         
+    def cutUniqueStrings(self, todoString, regExp, storingList):
+        regexp = re.compile(regExp)
+        for match in regexp.finditer(todoString):
+            found = match.group()[1:]
+            if (found not in set(storingList)):
+                storingList.append(found)
 
 def getTodoPath():
     '''todo'''
