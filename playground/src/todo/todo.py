@@ -7,23 +7,70 @@ todoVar = "TODO_DIR_PYTHON"
 todos = {'inbox':[], 'future':[], 'past':[], 'msd':[]}
 
 class Todo:
-    ''' central object '''
-    def __init__(self, todoString):
+    ''' holds a todo with all its information'''
+    def __init__(self, todoString, lineNumber = 0):
+        self.todoString = todoString
+        self.lineNumber = lineNumber
+        self.dueDistance = 0
+        self.priority = ""
         self.goal = ""
         self.timeContext = ""
-        self.priority = ""
         self.projects = []
         self.contexts = []
-        #self.cutProjects(todoString)
-        self.cutUniqueStrings(todoString, r'\+\S+', self.projects)
-        self.cutUniqueStrings(todoString, r'\@\S+', self.contexts)
+        todoString = self._cutTimeContext(todoString)
+        todoString = self._cutPriority(todoString)
+        todoString = self._cutUniqueStrings(todoString, r'\+\S+', self.projects)
+        todoString = self._cutUniqueStrings(todoString, r'\@\S+', self.contexts)
+        self.goal = todoString.strip()
         
-    def cutUniqueStrings(self, todoString, regExp, storingList):
+    def _cutUniqueStrings(self, todoString, regExp, storingList):
         regexp = re.compile(regExp)
         for match in regexp.finditer(todoString):
-            found = match.group()[1:]
-            if (found not in set(storingList)):
-                storingList.append(found)
+            found = match.group()
+            if (found[1:] not in set(storingList)):
+                storingList.append(found[1:])
+                todoString = todoString.replace(found, "")
+        return todoString
+                
+    def _cutPriority(self, todoString):
+        result = '(Z)'
+        match = re.compile(r'^\([ABCDEF]\)').search(todoString)
+        if match:
+            result = match.group()
+            todoString = todoString.replace(result, "")
+        self.priority = result
+        return todoString
+    
+    def _cutTimeContext(self, todoString):
+        match = re.compile(r'\+_[myw]\d{2}').search(todoString)
+        if match:
+            found = match.group()
+            self.timeContext = found[2:]
+            todoString = todoString.replace(found, "")
+        return todoString
+
+    def getDueDistance(self, comparisonDate = datetime.date.today()):
+        result = 0
+        quantifier = self.timeContext[0]
+        timeValue = int(self.timeContext[1:3])
+        comparisonYear = comparisonDate.isocalendar()[0]
+        comparisonMonth = comparisonDate.month
+        comparisonWeek = comparisonDate.isocalendar()[1]
+        if quantifier == "w":
+            testDate = comparisonDate + datetime.timedelta(weeks = (timeValue - comparisonWeek))
+            result = testDate - comparisonDate
+        elif quantifier == "m":
+            extraYear = 0
+            if comparisonMonth > timeValue:
+                extraYear = 1
+            testDate = datetime.date(comparisonYear + extraYear, timeValue, 1)
+            result = testDate - comparisonDate
+        elif quantifier == "y":
+            timeValue += 2000
+            testDate = datetime.date(timeValue, 1, 1)
+            result = testDate - comparisonDate
+        result = result.days
+        return result
 
 def getTodoPath():
     '''todo'''
@@ -73,8 +120,6 @@ def getTimeDistanceInDays(item, date = '12'):
             timeValue += 2000
             testDate = datetime.date(timeValue, 1, 1)
             result = testDate - currentDate
-        else:
-            print "problem"
         result = result.days
     return result
 
@@ -88,29 +133,30 @@ def getPriority(item):
 def listComparator(item1, item2):
     dist1 = getTimeDistanceInDays(item1)
     dist2 = getTimeDistanceInDays(item2)
-    result = cmp(dist1, dist2)
-    if (result == 0):
-        prio1 = getPriority(item1)
-        prio2 = getPriority(item2)
-        result = cmp(prio1, prio2)
-    return result
+#    result = cmp(dist1, dist2)
+#    if (result == 0):
+#        prio1 = getPriority(item1)
+#        prio2 = getPriority(item2)
+#        result = cmp(prio1, prio2)
+    return 0
 
 def printSingleLine(item):
-    print repr(getTimeDistanceInDays(item)).rjust(4), repr(getPriority(item)).rjust(4), item
+    print
+    # print repr(getTimeDistanceInDays(item)).rjust(4), repr(getPriority(item)).rjust(4), item
     
 
 def printTodos():
     '''todo'''
-    print "---- overdue ----"
+    print("---- overdue ----")
     for item in todos['past']:
         printSingleLine(item);
-    print "---- scheduled ----"
+    print("---- scheduled ----")
     for item in todos['future']:
         printSingleLine(item);
-    print "---- msd ----"
+    print("---- msd ----")
     for item in todos['msd']:
         printSingleLine(item);
-    print "---- inbox ----"
+    print("---- inbox ----")
     for item in todos['inbox']:
         printSingleLine(item);
 
