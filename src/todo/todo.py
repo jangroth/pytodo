@@ -81,7 +81,6 @@ class Todo:
         result = ""
         if contexts.index("@inbox") > 0:
             result = "inbox"
-        elif co
 
 def getTodoPath():
     '''todo'''
