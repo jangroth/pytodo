@@ -1,1 +1,8 @@
-a playground for some python stuff...
+A GTD extension for todo.txt (-> http://todotxt.com/), written in python. Hence the name :)
+
+Allows to use a new tag "+_" with single todos, which adds the following meaning:
++_yXX (+_y13) -> due in 2013
++_mXX (+_m09) -> due in September
++_wXX (+_w22) -> due in week 22
++_msd -> maybe some day
+
