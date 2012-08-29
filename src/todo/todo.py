@@ -5,45 +5,56 @@ import re
 #from chardet.test import result
 
 todoVar = "TODO_DIR_PYTHON"
-todos = {'inbox':[], 'future':[], 'current':[], 'past':[], 'msd':[]}
+todos = {'new':[], 'current':[], 'future':[], 'msd':[]}
 
 class Todo:
     '''
      Holds a single todo item with all its relevant information.
     '''
-    def __init__(self, todoString, lineNumber = 0):
+    def __init__(self, todoString, index = 0):
         self.todoString = todoString
-        self.lineNumber = lineNumber
-        self.dueDistance = 0
+        self.index = index
         self.priority = ""
         self.goal = ""
         self.timeContext = ""
         self.projects = []
         self.contexts = []
         self.isMsd = False
-        todoString, self.timeContext, self.isMsd = self._cutTimeContext(todoString)
-        todoString, self.priority = self._cutPriority(todoString)
-        todoString, self.projects = self._cutUniqueStrings(todoString, r'\+\S+', self.projects)
-        todoString, self.contexts = self._cutUniqueStrings(todoString, r'\@\S+', self.contexts)
-        self.goal = todoString.strip()
+        self.isNew = False
+        workString = todoString;
+        workString, self.timeContext, self.isMsd, self.isNew = self._cutTimeContext(workString)
+        workString, self.priority = self._cutPriority(workString)
+        workString, self.projects = self._cutUniqueStrings(workString, r'\+\S+', self.projects)
+        workString, self.contexts = self._cutUniqueStrings(workString, r'\@\S+', self.contexts)
+        self.goal = workString.strip()
         
     def _cutTimeContext(self, stringToParse):
         '''
         Cuts out the time context.
         '''
         result = ""
+        found = ""
         isMsd = False
+        isNew = False
         match = re.compile(r'\+_[myw]\d{2}').search(stringToParse)
         if match:
             found = match.group()
             result = found[2:]
-            stringToParse = stringToParse.replace(found, "")
         else:
             match = re.compile(r'\+_msd').search(stringToParse)
             if match:
+                found = match.group()
                 result = "msd"
                 isMsd = True
-        return (stringToParse, result, isMsd)
+            else:
+                match = re.compile(r'\+_\S+').search(stringToParse)
+                if match: 
+                    found = match.group()
+                result = "new"
+                isNew = True
+        stringToParse = stringToParse.replace(found, "")
+                
+        return (stringToParse, result, isMsd, isNew)
 
     def _cutPriority(self, stringToParse):
         '''
@@ -74,7 +85,7 @@ class Todo:
         provided comparison data or the current date.
         '''
         result = 0
-        if self.timeContext != "":
+        if self.timeContext != "" and self.isMsd == False and self.isNew == False:
             quantifier = self.timeContext[0]
             timeValue = int(self.timeContext[1:3])
             comparisonYear = comparisonDate.isocalendar()[0]
@@ -98,17 +109,20 @@ class Todo:
     
     def getCategory(self, comparisonDate = datetime.date.today()):
         result = ""
-        if "inbox" in self.contexts:
-            result = "inbox"
+        if self.isNew:
+            result = "new"
+        elif self.isMsd == True:
+            result = "msd"
         else:
             distance = self.getDueDistance(comparisonDate);
-            if distance == 0: 
+            if distance >= 0: 
                 result = "current"
-            elif distance > 0:
-                result = "future"
             else:
-                result = "past"
+                result = "future"
         return result
+    
+    def getPrintString(self):
+        return "%s - %s - %s - %s" % (self.index, self.timeContext, self.getDueDistance(), self.goal)
 
 def getTodoPath():
     '''todo'''
@@ -128,18 +142,18 @@ def readDataFromFile():
 
 def printTodos():
     '''todo'''
-    print("---- overdue ----")
-    for item in todos['past']:
-        print(item);
-    print("---- scheduled ----")
+    print("---- new ----")
+    for item in todos['new']:
+        print(item.getPrintString());
+    print("---- current ----")
+    for item in todos['current']:
+        print(item.getPrintString());
+    print("---- future ----")
     for item in todos['future']:
-        print(item);
+        print(item.getPrintString());
     print("---- msd ----")
     for item in todos['msd']:
-        print(item);
-    print("---- inbox ----")
-    for item in todos['inbox']:
-        print(item);
+        print(item.getPrintString());
 
 if __name__ == "__main__":
     readDataFromFile()

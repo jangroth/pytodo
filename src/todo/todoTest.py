@@ -42,18 +42,19 @@ class PriorityExtraction(unittest.TestCase):
             self.assertEqual(testTodo.priority, priority)
             
 class TimeContextExtraction(unittest.TestCase):
-    knownValues = ( ("my text is here", "", False),
-                    ("(A) some other stuff +_w12", "w12", False),
-                    ("(B) some other stuff +_m10", "m10", False),
-                    ("(C) some other stuff +_y14", "y14", False),
-                    ("(C) some other stuff +_msd", "msd", True),
-                    ("(D) some other stuff +_w11 @tast", "w11", False))
+    knownValues = ( ("my text is here", "new", False, True),
+                    ("(A) some other stuff +_w12", "w12", False, False),
+                    ("(B) some other stuff +_m10", "m10", False, False),
+                    ("(C) some other stuff +_y14", "y14", False, False),
+                    ("(C) some other stuff +_msd", "msd", True, False),
+                    ("(D) some other stuff +_w11 @tast", "w11", False, False))
 
     def testTimeContextExtraction(self):
-        for todoString, timeContext, isMsd in self.knownValues:
+        for todoString, timeContext, isMsd, isNew in self.knownValues:
             testTodo = todo.Todo(todoString)
             self.assertEqual(testTodo.timeContext, timeContext)
             self.assertEqual(testTodo.isMsd, isMsd)
+            self.assertEqual(testTodo.isNew, isNew)
             
 class GoalExtraction(unittest.TestCase):
     knownValues = ( ("my text is here", "my text is here"),
