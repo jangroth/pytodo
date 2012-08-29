@@ -6,4 +6,4 @@ Allows to use a new tag "+_" with single todos, which adds the following meaning
 +_wXX (+_w22) -> due in week 22
 +_msd -> maybe some day
 
-Code is pretty much in experimental beta stadium.
+Code is pretty much in experimental beta stadium, but it scans an existing todo.txt file and sorts its entries by upcoming due-dates.

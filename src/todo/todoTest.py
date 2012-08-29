@@ -42,16 +42,18 @@ class PriorityExtraction(unittest.TestCase):
             self.assertEqual(testTodo.priority, priority)
             
 class TimeContextExtraction(unittest.TestCase):
-    knownValues = ( ("my text is here", ""),
-                    ("(A) some other stuff +_w12", "w12"),
-                    ("(B) some other stuff +_m10", "m10"),
-                    ("(C) some other stuff +_y14", "y14"),
-                    ("(D) some other stuff +_w11 @tast", "w11"))
+    knownValues = ( ("my text is here", "", False),
+                    ("(A) some other stuff +_w12", "w12", False),
+                    ("(B) some other stuff +_m10", "m10", False),
+                    ("(C) some other stuff +_y14", "y14", False),
+                    ("(C) some other stuff +_msd", "msd", True),
+                    ("(D) some other stuff +_w11 @tast", "w11", False))
 
     def testTimeContextExtraction(self):
-        for todoString, timeContext in self.knownValues:
+        for todoString, timeContext, isMsd in self.knownValues:
             testTodo = todo.Todo(todoString)
             self.assertEqual(testTodo.timeContext, timeContext)
+            self.assertEqual(testTodo.isMsd, isMsd)
             
 class GoalExtraction(unittest.TestCase):
     knownValues = ( ("my text is here", "my text is here"),
@@ -70,7 +72,8 @@ class DueDateTest(unittest.TestCase):
                     ("w10",0),
                     ("w11",7),
                     ("y12",-66),
-                    ("y13",300))             
+                    ("y13",300),
+                    ("", 0))             
     def testDifferentDueDates(self):
         comparisonDate = datetime.date(2012,3,7)
         for timeString, result in self.knownValues:
