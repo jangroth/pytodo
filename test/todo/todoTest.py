@@ -1,6 +1,6 @@
 import unittest
-import todo
 import datetime
+from todo import Todo 
 
 class ProjectExtraction(unittest.TestCase):
     knownValues = ( ("my text is here +project ", ["project"]),
@@ -11,7 +11,7 @@ class ProjectExtraction(unittest.TestCase):
 
     def testProjectExtraction(self):
         for todoString, projects in self.knownValues:
-            testTodo = todo.Todo(todoString)
+            testTodo = Todo(todoString)
             self.assertEqual(testTodo.projects, projects)
             
 class ContextExtraction(unittest.TestCase):
@@ -23,7 +23,7 @@ class ContextExtraction(unittest.TestCase):
 
     def testContextExtraction(self):
         for todoString, contexts in self.knownValues:
-            testTodo = todo.Todo(todoString)
+            testTodo = Todo(todoString)
             self.assertEqual(testTodo.contexts, contexts)
             
 class PriorityExtraction(unittest.TestCase):
@@ -39,7 +39,7 @@ class PriorityExtraction(unittest.TestCase):
 
     def testPriorityExtraction(self):
         for todoString, priority in self.knownValues:
-            testTodo = todo.Todo(todoString)
+            testTodo = Todo(todoString)
             self.assertEqual(testTodo.priority, priority)
             
 class TimeContextExtraction(unittest.TestCase):
@@ -52,7 +52,7 @@ class TimeContextExtraction(unittest.TestCase):
 
     def testTimeContextExtraction(self):
         for todoString, timeContext, isMsd, isNew in self.knownValues:
-            testTodo = todo.Todo(todoString)
+            testTodo = Todo(todoString)
             self.assertEqual(testTodo.timeContext, timeContext)
             self.assertEqual(testTodo.isMsd, isMsd)
             self.assertEqual(testTodo.isNew, isNew)
@@ -64,7 +64,7 @@ class GoalExtraction(unittest.TestCase):
 
     def testTimeContextExtraction(self):
         for todoString, goal in self.knownValues:
-            testTodo = todo.Todo(todoString)
+            testTodo = Todo(todoString)
             self.assertEqual(testTodo.goal, goal)
 
 class DueDateTest(unittest.TestCase):
@@ -79,7 +79,7 @@ class DueDateTest(unittest.TestCase):
     def testDifferentDueDates(self):
         comparisonDate = datetime.date(2012,3,7)
         for timeString, result in self.knownValues:
-            testTodo = todo.Todo("some dummy stuff +_" + timeString)
+            testTodo = Todo("some dummy stuff +_" + timeString)
             self.assertEqual(testTodo.getDueDistance(comparisonDate), result)
 
 if __name__ == "__main__":
