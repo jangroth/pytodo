@@ -5,7 +5,7 @@ import re
 #from chardet.test import result
 
 todoVar = "TODO_DIR_PYTHON"
-todos = {'new':[], 'current':[], 'future':[], 'msd':[]}
+todos = {'new':[], 'past': [], 'current':[], 'future':[], 'msd':[]}
 
 class Todo:
     '''
@@ -115,19 +115,26 @@ class Todo:
             result = "msd"
         else:
             distance = self.getDueDistance(comparisonDate);
-            if distance >= 0: 
+            if distance == 0: 
                 result = "current"
-            else:
+            elif (distance > 0):
                 result = "future"
+            else:
+                result = "past"
         return result
     
+    def getSortKey(self):
+        return "%s %s %s" % (self.priority, 10000 + self.getDueDistance(), self.goal.lower());
+        # return self.getDueDistance()
+    
     def getPrintString(self):
-        return "%s - %s - %s - %s" % (self.index, self.timeContext, self.getDueDistance(), self.goal)
+        return "%s - (%s:%s) - %s - %s" % (self.index, self.timeContext, self.getDueDistance(), self.priority, self.goal)
 
 def getTodoPath():
     '''todo'''
     # return os.environ['TODO_DIR_PYTHON'] + "/todo.txt"
-    return "files/play.txt"
+    return "/data/Dropbox/todo/todo.txt"
+    # return "files/play.txt"
     
 def readDataFromFile():
     '''read data file and dispatch into dictionary'''
@@ -143,16 +150,19 @@ def readDataFromFile():
 def printTodos():
     '''todo'''
     print("---- new ----")
-    for item in todos['new']:
+    for item in sorted(todos['new'], key = lambda index : index.getSortKey()):
+        print(item.getPrintString());
+    print("---- past ----")
+    for item in sorted(todos['past'], key = lambda index : index.getSortKey()):
         print(item.getPrintString());
     print("---- current ----")
-    for item in todos['current']:
+    for item in sorted(todos['current'], key = lambda index : index.getSortKey()):
         print(item.getPrintString());
     print("---- future ----")
-    for item in todos['future']:
+    for item in sorted(todos['future'], key = lambda index : index.getSortKey()):
         print(item.getPrintString());
     print("---- msd ----")
-    for item in todos['msd']:
+    for item in sorted(todos['msd'], key = lambda index : index.getSortKey()):
         print(item.getPrintString());
 
 if __name__ == "__main__":
