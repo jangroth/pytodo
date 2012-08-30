@@ -61,7 +61,7 @@ class Todo:
         Cuts out the priority, uses Z if not set.
         '''
         result = '(Z)'
-        match = re.compile(r'^\([ABCDEF]\)').search(stringToParse)
+        match = re.compile(r'^\([A-Z]\)').search(stringToParse)
         if match:
             result = match.group()
             stringToParse = stringToParse.replace(result, "")

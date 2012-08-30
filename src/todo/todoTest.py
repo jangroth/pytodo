@@ -34,7 +34,8 @@ class PriorityExtraction(unittest.TestCase):
                     ("(D) some other stuff @test @tast", "(D)"),
                     ("(E) some other stuff @test @tast", "(E)"),
                     ("(F) some other stuff @test @tast", "(F)"),
-                    ("(G) some other stuff @test @tast", "(Z)"))
+                    ("(G) some other stuff @test @tast", "(G)"),
+                    ("(Z) some other stuff @test @tast", "(Z)"))
 
     def testPriorityExtraction(self):
         for todoString, priority in self.knownValues:
