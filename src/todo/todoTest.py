@@ -1,13 +1,13 @@
 import unittest
 import datetime
-from todo import Todo 
+from todo import Todo
 
 class ProjectExtraction(unittest.TestCase):
-    knownValues = ( ("my text is here +project ", ["project"]),
-                    ("some other stuff +test +tast", ["test", "tast"]),
-                    ("some other stuff +test +test", ["test"]),
-                    ("some other stuff +real *test @tast", ["real"]),
-                    ("some other stuff", []))
+    knownValues = ( ("my text is here +project ", {"project"}),
+                    ("some other stuff +test +tast", {"test", "tast"}),
+                    ("some other stuff +test +test", {"test"}),
+                    ("some other stuff +real *test @tast", {"real"}),
+                    ("some other stuff", set()))
 
     def testProjectExtraction(self):
         for todoString, projects in self.knownValues:
@@ -15,11 +15,11 @@ class ProjectExtraction(unittest.TestCase):
             self.assertEqual(testTodo.projects, projects)
             
 class ContextExtraction(unittest.TestCase):
-    knownValues = ( ("my text is here @context ", ["context"]),
-                    ("some other stuff @test @tast", ["test", "tast"]),
-                    ("some other stuff @test @test", ["test"]),
-                    ("some other stuff +real *test @tast", ["tast"]),
-                    ("some other stuff", []))
+    knownValues = ( ("my text is here @context ", {"context"}),
+                    ("some other stuff @test @tast", {"test", "tast"}),
+                    ("some other stuff @test @test", {"test"}),
+                    ("some other stuff +real *test @tast", {"tast"}),
+                    ("some other stuff", set()))
 
     def testContextExtraction(self):
         for todoString, contexts in self.knownValues:
@@ -27,15 +27,15 @@ class ContextExtraction(unittest.TestCase):
             self.assertEqual(testTodo.contexts, contexts)
             
 class PriorityExtraction(unittest.TestCase):
-    knownValues = ( ("my text is here", "(Z)"),
-                    ("(A) some other stuff @test @tast", "(A)"),
-                    ("(B) some other stuff @test @tast", "(B)"),
-                    ("(C) some other stuff @test @tast", "(C)"),
-                    ("(D) some other stuff @test @tast", "(D)"),
-                    ("(E) some other stuff @test @tast", "(E)"),
-                    ("(F) some other stuff @test @tast", "(F)"),
-                    ("(G) some other stuff @test @tast", "(G)"),
-                    ("(Z) some other stuff @test @tast", "(Z)"))
+    knownValues = ( ("my text is here", "Z"),
+                    ("(A) some other stuff @test @tast", "A"),
+                    ("(B) some other stuff @test @tast", "B"),
+                    ("(C) some other stuff @test @tast", "C"),
+                    ("(D) some other stuff @test @tast", "D"),
+                    ("(E) some other stuff @test @tast", "E"),
+                    ("(F) some other stuff @test @tast", "F"),
+                    ("(G) some other stuff @test @tast", "G"),
+                    ("(Z) some other stuff @test @tast", "Z"))
 
     def testPriorityExtraction(self):
         for todoString, priority in self.knownValues:

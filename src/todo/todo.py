@@ -1,4 +1,3 @@
-#/usr/bin/env python
 import datetime
 import re
 
@@ -12,8 +11,8 @@ class Todo:
         self.priority = ""
         self.goal = ""
         self.timeContext = ""
-        self.projects = []
-        self.contexts = []
+        self.projects = set()
+        self.contexts = set()
         self.isMsd = False
         self.isNew = False
         workString = todoString;
@@ -60,7 +59,7 @@ class Todo:
         if match:
             result = match.group()
             stringToParse = stringToParse.replace(result, "")
-        return (stringToParse, result)
+        return (stringToParse, result[1:2])
     
     def _cutUniqueStrings(self, todoString, regExp, storingList):
         '''
@@ -70,7 +69,7 @@ class Todo:
         for match in regexp.finditer(todoString):
             found = match.group()
             if (found[1:] not in set(storingList)):
-                storingList.append(found[1:])
+                storingList.add(found[1:])
                 todoString = todoString.replace(found, "")
         return (todoString, storingList)
                 
@@ -120,7 +119,9 @@ class Todo:
     
     def getSortKey(self):
         return "%s %s %s" % (self.priority, 10000 + self.getDueDistance(), self.goal.lower());
-        # return self.getDueDistance()
     
     def getPrintString(self):
-        return "%s - (%s:%s) - %s - %s" % (self.index, self.timeContext, self.getDueDistance(), self.priority, self.goal)
+        return "(%s) - % *d - %s - +%s @%s - %s" % (self.priority, 4, self.getDueDistance(), self.goal, "-".join(a for a in self.projects), " ".join(a for a in self.contexts), self.index)
+
+
+
