@@ -1,6 +1,7 @@
 .metadata
 .project
 .pydevproject
+.settings
 *.pyc
 *.*~
 *~

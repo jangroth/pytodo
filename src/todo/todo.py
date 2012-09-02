@@ -16,13 +16,13 @@ class Todo:
         self.isMsd = False
         self.isNew = False
         workString = todoString;
-        workString, self.timeContext, self.isMsd, self.isNew = self._cutTimeContext(workString)
-        workString, self.priority = self._cutPriority(workString)
-        workString, self.projects = self._cutUniqueStrings(workString, r'\+\S+', self.projects)
-        workString, self.contexts = self._cutUniqueStrings(workString, r'\@\S+', self.contexts)
+        workString, self.timeContext, self.isMsd, self.isNew = self._cut_time_context(workString)
+        workString, self.priority = self._cut_priority(workString)
+        workString, self.projects = self._cut_uniqueStrings(workString, r'\+\S+', self.projects)
+        workString, self.contexts = self._cut_uniqueStrings(workString, r'\@\S+', self.contexts)
         self.goal = workString.strip()
         
-    def _cutTimeContext(self, stringToParse):
+    def _cut_time_context(self, stringToParse):
         '''
         Cuts out the time context.
         '''
@@ -50,7 +50,7 @@ class Todo:
                 
         return (stringToParse, result, isMsd, isNew)
 
-    def _cutPriority(self, stringToParse):
+    def _cut_priority(self, stringToParse):
         '''
         Cuts out the priority, uses Z if not set.
         '''
@@ -61,7 +61,7 @@ class Todo:
             stringToParse = stringToParse.replace(result, "")
         return (stringToParse, result[1:2])
     
-    def _cutUniqueStrings(self, todoString, regExp, storingList):
+    def _cut_uniqueStrings(self, todoString, regExp, storingList):
         '''
         Cuts out a given regex and adds to provided list.
         '''
@@ -73,7 +73,7 @@ class Todo:
                 todoString = todoString.replace(found, "")
         return (todoString, storingList)
                 
-    def getDueDistance(self, comparisonDate = datetime.date.today()):
+    def get_due_distance(self, comparisonDate = datetime.date.today()):
         '''
         Evaluates the timeContext and calculates distance to either the 
         provided comparison data or the current date.
@@ -101,14 +101,14 @@ class Todo:
             result = result.days
         return result
     
-    def getCategory(self, comparisonDate = datetime.date.today()):
+    def get_category(self, comparisonDate = datetime.date.today()):
         result = ""
         if self.isNew:
             result = "new"
         elif self.isMsd == True:
             result = "msd"
         else:
-            distance = self.getDueDistance(comparisonDate);
+            distance = self.get_due_distance(comparisonDate);
             if distance == 0: 
                 result = "current"
             elif (distance > 0):
@@ -117,11 +117,11 @@ class Todo:
                 result = "past"
         return result
     
-    def getSortKey(self):
-        return "%s %s %s" % (self.priority, 10000 + self.getDueDistance(), self.goal.lower());
+    def get_sort_key(self):
+        return "%s %s %s" % (self.priority, 10000 + self.get_due_distance(), self.goal.lower());
     
-    def getPrintString(self):
-        return "(%s) - % *d - %s - +%s @%s - %s" % (self.priority, 4, self.getDueDistance(), self.goal, "-".join(a for a in self.projects), " ".join(a for a in self.contexts), self.index)
+    def get_print_string(self):
+        return "(%s) - % *d - %s - +%s @%s - %s" % (self.priority, 4, self.get_due_distance(), self.goal, "-".join(a for a in self.projects), " ".join(a for a in self.contexts), self.index)
 
 
 
