@@ -5,11 +5,6 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 import os
-from datetime import timedelta
-from time import time
-from math import floor
-gtk.gdk.threads_init()
-import gobject
 import appindicator
 
 #Parameters
@@ -31,11 +26,9 @@ class TodoIndicator:
         menu = gtk.Menu()
         # projects
         for projectRow in self.todoList.get_projects():
-            item = gtk.MenuItem("+%s (%s %s %s %s)" % (projectRow[0].ljust(15," "), projectRow[1], projectRow[2], projectRow[3], projectRow[4]))
-            subMenu = gtk.Menu()
-            subItem = gtk.MenuItem("sub")
-            subMenu.append(subItem)
-            item.set_submenu(subMenu)
+            # item = gtk.MenuItem("+%s (%s %s %s %s %s)" % (projectRow[0].ljust(10, " "), projectRow[1], projectRow[2], projectRow[3], projectRow[4], projectRow[5]))
+            item = gtk.MenuItem("+%s" % (projectRow[0]))
+            item.set_submenu(self._create_submenu(project = projectRow[0]))
             menu.append(item)
         separator = gtk.SeparatorMenuItem()
         separator.show()
@@ -43,7 +36,7 @@ class TodoIndicator:
         # contexts
         for context in self.todoList.contexts:
             item = gtk.MenuItem("@" + context)
-            item.show()
+            item.set_submenu(self._create_submenu(context = context))
             menu.append(item)
         # Tooltip item
         # A separator
@@ -56,6 +49,19 @@ class TodoIndicator:
         item.show()
         menu.append(item)
         return menu
+    
+    def _create_submenu(self, project="", context=""):
+        result = gtk.Menu()
+        dict = self.todoList.get_as_dictionary(project, context)
+        for category in dict.keys():
+            menuItem = gtk.MenuItem("=== %s === (%s)" % (category, len(dict[category])))
+            menuItem.set_sensitive(False)
+            result.append(menuItem)
+            for item in sorted(dict[category], key=lambda index : index.get_sort_key()):
+                menuItem = gtk.MenuItem(item.get_print_string())
+                result.append(menuItem)
+        return result
+        
     
     def main(self):
         # All PyGTK applications must have a gtk.main(). Control ends here

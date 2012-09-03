@@ -12,7 +12,7 @@ class TodoList:
         self.contexts = set()
         for index, item in enumerate(listOfRawStrings):
             item = item[0:len(item) - 1]
-            todo = Todo(item, index)
+            todo = Todo(item, index + 1)
             self.todoList.append(todo)
             self.projects = self.projects.union(todo.projects)
             self.contexts = self.contexts.union(todo.contexts)
