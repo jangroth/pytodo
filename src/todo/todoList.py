@@ -4,18 +4,19 @@ from collections import defaultdict
 
 class TodoList:
     '''
-    Holds a list of todo items and provides filtering & grouping operations.
+    Parses a todo.txt file, holds all items, 
+    and provides filtering & grouping operations.
     '''
-    def __init__(self, listOfRawStrings=[]):
-        self.todoList = []
-        self.projects = set()
-        self.contexts = set()
-        for index, item in enumerate(listOfRawStrings):
-            item = item[0:len(item) - 1]
-            todo = Todo(item, index + 1)
-            self.todoList.append(todo)
-            self.projects = self.projects.union(todo.projects)
-            self.contexts = self.contexts.union(todo.contexts)
+    def __init__(self, filePath):
+        self.filePath = filePath
+        self.load_from_file()
+    
+    def _read_from_file(self, filePath):
+        '''read data file and dispatch into dictionary'''
+        todoFile = open(filePath, 'r')
+        allLines = todoFile.readlines()
+        todoFile.close()
+        return allLines
     
     def _filter(self, todo, project, context):
         result = True
@@ -24,6 +25,18 @@ class TodoList:
         if context != "":
             result = context in todo.contexts
         return result
+    
+    def load_from_file(self):
+        self.rawLines = self._read_from_file(self.filePath)
+        self.todoList = []
+        self.projects = set()
+        self.contexts = set()
+        for index, item in enumerate(self.rawLines):
+            item = item[0:len(item) - 1]
+            todo = Todo(item, index + 1)
+            self.todoList.append(todo)
+            self.projects = self.projects.union(todo.projects)
+            self.contexts = self.contexts.union(todo.contexts)
     
     def get_projects(self):
         result = []

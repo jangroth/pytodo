@@ -11,22 +11,26 @@ import appindicator
 MIN_WORK_TIME = 60 * 10 # min work time in seconds
 
 class TodoIndicator:
+    '''
+    GTK indicator that integrates in unity.
+    '''
     def __init__(self, todoList):
         self.todoList = todoList;
         self.ind = appindicator.Indicator("todo", "todo", appindicator.CATEGORY_APPLICATION_STATUS)
         self.ind.set_status (appindicator.STATUS_ACTIVE)
-        self.ind.set_icon(self.icon_directory() + "todo.png")
+        self.ind.set_icon(self._icon_directory() + "todo.png")
         self.menu = self._create_menu()
         self.menu.show_all()
         self.ind.set_menu(self.menu)
-    def icon_directory(self):
+
+    def _icon_directory(self):
         return os.path.dirname(os.path.realpath(__file__)) + os.path.sep 
+    
     def _create_menu(self):
         menu = self._create_overview_menu()
         menu.append(gtk.SeparatorMenuItem())
         # projects
         for projectRow in self.todoList.get_projects():
-            # item = gtk.MenuItem("+%s (%s %s %s %s %s)" % (projectRow[0].ljust(10, " "), projectRow[1], projectRow[2], projectRow[3], projectRow[4], projectRow[5]))
             item = gtk.MenuItem("+%s" % (projectRow[0]))
             item.set_submenu(self._create_submenu(project = projectRow[0]))
             menu.append(item)
@@ -37,13 +41,21 @@ class TodoIndicator:
             item.set_submenu(self._create_submenu(context = context))
             menu.append(item)
         menu.append(gtk.SeparatorMenuItem())
-        # update & quit 
-        #TODO update
-        item = gtk.MenuItem('Quit')
+        # update 
+        item = gtk.MenuItem('upate')
+        item.connect("activate", self._update_all, None)
+        menu.append(item)
+        # quit
+        item = gtk.MenuItem('quit')
         item.connect("activate", gtk.main_quit, None)
-        item.show()
         menu.append(item)
         return menu
+    
+    def _update_all(self, *args):
+        print "update"
+        self.todoList.load_from_file()
+        self.__init__(self.todoList) 
+        # self.todoList.load_from_file()
     
     def _create_overview_menu(self):
         result = gtk.Menu()

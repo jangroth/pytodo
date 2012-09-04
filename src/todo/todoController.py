@@ -21,9 +21,8 @@ def read_data_from_file():
     return todoList
 
 if __name__ == "__main__":
-    todoList = read_data_from_file()
+    todoList = TodoList(get_todo_path())
     todoList.print_stats()
-    todoList.get_projects()
     todoList.print_as_dictionary()
     app = TodoIndicator(todoList)
     app.main()

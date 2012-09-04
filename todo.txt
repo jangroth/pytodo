@@ -3,3 +3,5 @@ download python source-code
 plausisbility check (no project, no context, no time)
 find missing @alex
 reload / update
+externalize all configs
+externalizes tests
