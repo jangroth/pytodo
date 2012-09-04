@@ -121,7 +121,4 @@ class Todo:
         return "%s %s %s" % (self.priority, 10000 + self.get_due_distance(), self.goal.lower());
     
     def get_print_string(self):
-        return "(%s) - % *d - %s - +%s @%s - %s" % (self.priority, 4, self.get_due_distance(), self.goal, "-".join(a for a in self.projects), " ".join(a for a in self.contexts), self.index)
-
-
-
+        return "(%s) - %s - +%s @%s - (%s - %s)" % (self.priority, self.goal.lower(), "-".join(a for a in self.projects), " ".join(a for a in self.contexts), self.index, self.get_due_distance())
