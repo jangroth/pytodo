@@ -4,30 +4,26 @@ from collections import defaultdict
 
 class TodoList:
     '''
-    Parses a todo.txt file, holds all items, 
-    and provides filtering & grouping operations.
+    Parses a todo.txt file, holds all items, provides filtering & grouping operations.
     '''
     def __init__(self, filePath):
         self.filePath = filePath
-        self.load_from_file()
+        self.refresh()
     
-    def _read_from_file(self, filePath):
-        '''read data file and dispatch into dictionary'''
+    def _read_todos(self, filePath):
+        '''
+        Returns all lines of the given todo.txt file.
+        '''
         todoFile = open(filePath, 'r')
         allLines = todoFile.readlines()
         todoFile.close()
         return allLines
     
-    def _filter(self, todo, project, context):
-        result = True
-        if project != "":
-            result = project in todo.projects
-        if context != "":
-            result = context in todo.contexts
-        return result
-    
-    def load_from_file(self):
-        self.rawLines = self._read_from_file(self.filePath)
+    def refresh(self):
+        '''
+        (re-)loads and parses list of todos.
+        '''
+        self.rawLines = self._read_todos(self.filePath)
         self.todoList = []
         self.projects = set()
         self.contexts = set()
@@ -38,27 +34,21 @@ class TodoList:
             self.projects = self.projects.union(todo.projects)
             self.contexts = self.contexts.union(todo.contexts)
     
-    def get_projects(self):
-        result = []
-        projects = sorted(self.projects)
-        for project in projects:
-            projDict = self.get_as_dictionary(project)
-            row = [project]
-            for item in sorted(projDict.iterkeys()):
-                row.append(item[0:2] + ":"+ str(len(projDict[item])))
-            result.append(row)
-        print result
-        return result
-    
     def get_as_dictionary(self, project="", context="", comparisonDate=datetime.date.today()):
-        #result = defaultdict(list)
-        result = {'past':[],'current':[],'future':[],'new':[],'msd':[],}
+        '''
+        Returns fixed dictionary of time category (key) and todo (value), uses filter if provided. 
+        '''
+        result = {'past':[], 'current':[], 'future':[], 'new':[], 'msd':[], }
         for todo in self.todoList:
-            if self._filter(todo, project, context):
+            if todo.matches_project_or_context(project, context):
                 result[todo.get_category(comparisonDate)].append(todo)
         return result
     
     def print_as_dictionary(self, project="", context="", comparisonDate=datetime.date.today()):
+        '''
+        Prints dictionary of time category (key) and todo list (value), uses filter if provided. Mainly 
+        useful for debugging purposes. 
+        '''
         dict = self.get_as_dictionary(project, context, comparisonDate)
         for category in dict.keys():
             print "============= %s =============" % (category)
@@ -66,11 +56,10 @@ class TodoList:
                 print "%s" % item.get_print_string()
                 
     def print_stats(self):
+        '''
+        Prints basic statistic about list of todos.
+        '''
         print "%s todos" % (len(self.todoList))
         print "%s projects (%s)" % (len(self.projects), "-".join(a for a in self.projects))
         print "%s contexts (%s)" % (len(self.contexts), "-".join(a for a in self.contexts))
-    
-        
-        
-        
     

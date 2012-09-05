@@ -52,7 +52,7 @@ class Todo:
 
     def _cut_priority(self, stringToParse):
         '''
-        Cuts out the priority, uses Z if not set.
+        Cuts out the priority, uses priority Z if no information found.
         '''
         result = '(Z)'
         match = re.compile(r'^\([A-Z]\)').search(stringToParse)
@@ -102,6 +102,9 @@ class Todo:
         return result
     
     def get_category(self, comparisonDate = datetime.date.today()):
+        '''
+        Returns exactly one category (new  - current - future - past - msd) per todo item.
+        '''
         result = ""
         if self.isNew:
             result = "new"
@@ -117,8 +120,26 @@ class Todo:
                 result = "past"
         return result
     
+    def matches_project_or_context(self, project, context):
+        '''
+        If checks for match on project or context - if data is provided. Returns
+        true otherwise.
+        '''
+        result = True
+        if project != "":
+            result = project in self.projects
+        if context != "":
+            result = context in self.contexts
+        return result
+    
     def get_sort_key(self):
+        '''
+        Used to determine the sort order of any two todos.
+        '''
         return "%s %s %s" % (self.priority, 10000 + self.get_due_distance(), self.goal.lower());
     
     def get_print_string(self):
+        '''
+        Returns a printable string representation.
+        '''
         return "(%s) - %s - +%s @%s - (%s - %s)" % (self.priority, self.goal.lower(), "-".join(a for a in self.projects), " ".join(a for a in self.contexts), self.index, self.get_due_distance())

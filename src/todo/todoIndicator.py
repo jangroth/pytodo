@@ -30,9 +30,9 @@ class TodoIndicator:
         menu = self._create_overview_menu()
         menu.append(gtk.SeparatorMenuItem())
         # projects
-        for projectRow in self.todoList.get_projects():
-            item = gtk.MenuItem("+%s" % (projectRow[0]))
-            item.set_submenu(self._create_submenu(project = projectRow[0]))
+        for project in self.todoList.projects:
+            item = gtk.MenuItem("+" + project)
+            item.set_submenu(self._create_submenu(project = project))
             menu.append(item)
         menu.append(gtk.SeparatorMenuItem())
         # contexts
@@ -42,20 +42,19 @@ class TodoIndicator:
             menu.append(item)
         menu.append(gtk.SeparatorMenuItem())
         # update 
-        item = gtk.MenuItem('upate')
+        item = gtk.MenuItem('Upate')
         item.connect("activate", self._update_all, None)
         menu.append(item)
         # quit
-        item = gtk.MenuItem('quit')
+        item = gtk.MenuItem('Quit')
         item.connect("activate", gtk.main_quit, None)
         menu.append(item)
         return menu
     
     def _update_all(self, *args):
         print "update"
-        self.todoList.load_from_file()
+        self.todoList.refresh()
         self.__init__(self.todoList) 
-        # self.todoList.load_from_file()
     
     def _create_overview_menu(self):
         result = gtk.Menu()
