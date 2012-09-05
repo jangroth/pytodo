@@ -1,8 +1,8 @@
-update python version to 3.x
+x reload / update
+update python version to 3.x (?)
 download python source-code
-plausisbility check (no project, no context, no time)
+plausisbility check (no project, no context, no time) -> malformed
 find missing @alex
-reload / update
 externalize all configs
 use constants for all strings
 externalizes tests

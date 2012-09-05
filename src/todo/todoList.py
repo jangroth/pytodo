@@ -1,6 +1,5 @@
 import datetime
 from todo import Todo
-from collections import defaultdict
 
 class TodoList:
     '''
@@ -59,7 +58,7 @@ class TodoList:
         '''
         Prints basic statistic about list of todos.
         '''
-        print "%s todos" % (len(self.todoList))
+        print "Found %s todos at %s" % (len(self.todoList), self.filePath)
         print "%s projects (%s)" % (len(self.projects), "-".join(a for a in self.projects))
         print "%s contexts (%s)" % (len(self.contexts), "-".join(a for a in self.contexts))
     

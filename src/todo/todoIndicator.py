@@ -6,6 +6,7 @@ pygtk.require('2.0')
 import gtk
 import os
 import appindicator
+from todoList import TodoList
 
 #Parameters
 MIN_WORK_TIME = 60 * 10 # min work time in seconds
@@ -14,18 +15,24 @@ class TodoIndicator:
     '''
     GTK indicator that integrates in unity.
     '''
-    def __init__(self, todoList):
-        self.todoList = todoList;
-        self.ind = appindicator.Indicator("todo", "todo", appindicator.CATEGORY_APPLICATION_STATUS)
-        self.ind.set_status (appindicator.STATUS_ACTIVE)
-        self.ind.set_icon(self._icon_directory() + "todo.png")
+    def __init__(self, todoFileLocation):
+        print "initializing..."
+        self.todoFileLocation = todoFileLocation
+        self._refresh_all()
+        
+    def _refresh_all(self):
+        self.todoList = TodoList(self.todoFileLocation);
+        self.ind = self._get_indicator()
         self.menu = self._create_menu()
-        self.menu.show_all()
         self.ind.set_menu(self.menu)
-
-    def _icon_directory(self):
-        return os.path.dirname(os.path.realpath(__file__)) + os.path.sep 
-    
+        self.todoList.print_stats()
+        
+    def _get_indicator(self):
+        result = appindicator.Indicator("todo", "todo", appindicator.CATEGORY_APPLICATION_STATUS)
+        result.set_status (appindicator.STATUS_ACTIVE)
+        result.set_icon(os.path.dirname(os.path.realpath(__file__)) + os.path.sep + "todo.png")
+        return result
+            
     def _create_menu(self):
         menu = self._create_overview_menu()
         menu.append(gtk.SeparatorMenuItem())
@@ -47,15 +54,19 @@ class TodoIndicator:
         menu.append(item)
         # quit
         item = gtk.MenuItem('Quit')
-        item.connect("activate", gtk.main_quit, None)
+        item.connect("activate", self._quit, None)
         menu.append(item)
+        menu.show_all()
         return menu
     
     def _update_all(self, *args):
-        print "update"
-        self.todoList.refresh()
-        self.__init__(self.todoList) 
+        print "updating..."
+        self._refresh_all()
     
+    def _quit(self, *args):
+        print "bye..."
+        gtk.main_quit()
+        
     def _create_overview_menu(self):
         result = gtk.Menu()
         dict = self.todoList.get_as_dictionary()
@@ -84,3 +95,6 @@ class TodoIndicator:
     
     def main(self):
         gtk.main()
+
+if __name__ == "__main__":
+    TodoIndicator("/data/Dropbox/todo/todo.txt").main()
