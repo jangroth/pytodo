@@ -1,8 +1,14 @@
 x reload / update
-update python version to 3.x (?)
-download python source-code
-plausisbility check (no project, no context, no time) -> malformed
+x plausisbility check (no project, no context, no time) -> malformed
+
+automatic update every minute 
+errorhandling (no / wrong file, weired format)
 find missing @alex
-externalize all configs
+decide about on-click behaviour of items
+externalize all configs, decide about call parameters
 use constants for all strings
-externalizes tests
+externalizes tests, make suite
+change time symbol from +_? -> * (-> would break existing todo scripts) -> make configurable
+
+decide about final versions (update python to 3.x ?)
+download python source-code

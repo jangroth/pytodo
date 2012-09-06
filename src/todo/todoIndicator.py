@@ -34,8 +34,8 @@ class TodoIndicator:
         return result
             
     def _create_menu(self):
-        menu = self._create_overview_menu()
-        menu.append(gtk.SeparatorMenuItem())
+        menu = gtk.Menu()
+        menu = self._append_overview_menu(menu)
         # projects
         for project in self.todoList.projects:
             item = gtk.MenuItem("+" + project)
@@ -48,6 +48,8 @@ class TodoIndicator:
             item.set_submenu(self._create_submenu(context = context))
             menu.append(item)
         menu.append(gtk.SeparatorMenuItem())
+        # malformed
+        menu = self._append_malformed_menu(menu)
         # update 
         item = gtk.MenuItem('Upate')
         item.connect("activate", self._update_all, None)
@@ -59,6 +61,21 @@ class TodoIndicator:
         menu.show_all()
         return menu
     
+    def _append_malformed_menu(self, menu):
+        malformed = []
+        for todo in self.todoList.todos:
+            if todo.isMalformed == True:
+                malformed.append(gtk.MenuItem("%s - %s" % (todo.index, todo.todoString)))
+        if len(malformed) > 0:
+            item = gtk.MenuItem("malformed (%s)" % (len(malformed)))
+            subMenu = gtk.Menu()
+            for malItem in malformed:            
+                subMenu.append(malItem)
+            item.set_submenu(subMenu)
+            menu.append(item)    
+            menu.append(gtk.SeparatorMenuItem())
+        return menu
+    
     def _update_all(self, *args):
         print "updating..."
         self._refresh_all()
@@ -67,8 +84,7 @@ class TodoIndicator:
         print "bye..."
         gtk.main_quit()
         
-    def _create_overview_menu(self):
-        result = gtk.Menu()
+    def _append_overview_menu(self, menu):
         dict = self.todoList.get_as_dictionary()
         for category in dict.keys():
             catLength = len(dict[category])
@@ -79,8 +95,9 @@ class TodoIndicator:
                 for item in sorted(dict[category], key=lambda index : index.get_sort_key()):
                     subMenu.append(gtk.MenuItem(item.get_print_string()))
                 menuItem.set_submenu(subMenu)
-            result.append(menuItem)
-        return result
+            menu.append(menuItem)
+        menu.append(gtk.SeparatorMenuItem())
+        return menu
                 
     def _create_submenu(self, project="", context=""):
         result = gtk.Menu()

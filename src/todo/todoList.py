@@ -23,13 +23,13 @@ class TodoList:
         (re-)loads and parses list of todos.
         '''
         self.rawLines = self._read_todos(self.filePath)
-        self.todoList = []
+        self.todos = []
         self.projects = set()
         self.contexts = set()
         for index, item in enumerate(self.rawLines):
             item = item[0:len(item) - 1]
             todo = Todo(item, index + 1)
-            self.todoList.append(todo)
+            self.todos.append(todo)
             self.projects = self.projects.union(todo.projects)
             self.contexts = self.contexts.union(todo.contexts)
     
@@ -38,7 +38,7 @@ class TodoList:
         Returns fixed dictionary of time category (key) and todo (value), uses filter if provided. 
         '''
         result = {'past':[], 'current':[], 'future':[], 'new':[], 'msd':[], }
-        for todo in self.todoList:
+        for todo in self.todos:
             if todo.matches_project_or_context(project, context):
                 result[todo.get_category(comparisonDate)].append(todo)
         return result
@@ -58,7 +58,9 @@ class TodoList:
         '''
         Prints basic statistic about list of todos.
         '''
-        print "Found %s todos at %s" % (len(self.todoList), self.filePath)
+        print "Found %s todos at %s" % (len(self.todos), self.filePath)
         print "%s projects (%s)" % (len(self.projects), "-".join(a for a in self.projects))
         print "%s contexts (%s)" % (len(self.contexts), "-".join(a for a in self.contexts))
-    
+ 
+if __name__ == "__main__":
+    print "start with 'python todoIndicator.py'"   

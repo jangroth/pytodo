@@ -5,7 +5,8 @@ class Todo:
     '''
      Holds a single todo item with all its relevant information.
     '''
-    def __init__(self, todoString, index = 0):
+    
+    def __init__(self, todoString, index=0):
         self.todoString = todoString
         self.index = index
         self.priority = ""
@@ -21,6 +22,7 @@ class Todo:
         workString, self.projects = self._cut_uniqueStrings(workString, r'\+\S+', self.projects)
         workString, self.contexts = self._cut_uniqueStrings(workString, r'\@\S+', self.contexts)
         self.goal = workString.strip()
+        self.isMalformed = self._check_for_malformed_warning()
         
     def _cut_time_context(self, stringToParse):
         '''
@@ -73,7 +75,18 @@ class Todo:
                 todoString = todoString.replace(found, "")
         return (todoString, storingList)
                 
-    def get_due_distance(self, comparisonDate = datetime.date.today()):
+    def _check_for_malformed_warning(self):
+        '''
+        No project or context information will result in a warning.
+        '''
+        result = False
+        if self.isNew == False:
+            if len(self.projects) == 0 or len(self.contexts) == 0:
+                print "- possibly malformed at line %s: %s" % (self.index, self.todoString)
+                result = True
+        return result
+
+    def get_due_distance(self, comparisonDate=datetime.date.today()):
         '''
         Evaluates the timeContext and calculates distance to either the 
         provided comparison data or the current date.
@@ -86,7 +99,7 @@ class Todo:
             comparisonMonth = comparisonDate.month
             comparisonWeek = comparisonDate.isocalendar()[1]
             if quantifier == "w":
-                testDate = comparisonDate + datetime.timedelta(weeks = (timeValue - comparisonWeek))
+                testDate = comparisonDate + datetime.timedelta(weeks=(timeValue - comparisonWeek))
                 result = testDate - comparisonDate
             elif quantifier == "m":
                 extraYear = 0
@@ -101,7 +114,7 @@ class Todo:
             result = result.days
         return result
     
-    def get_category(self, comparisonDate = datetime.date.today()):
+    def get_category(self, comparisonDate=datetime.date.today()):
         '''
         Returns exactly one category (new  - current - future - past - msd) per todo item.
         '''
@@ -143,3 +156,6 @@ class Todo:
         Returns a printable string representation.
         '''
         return "(%s) - %s - +%s @%s - (%s - %s)" % (self.priority, self.goal.lower(), "-".join(a for a in self.projects), " ".join(a for a in self.contexts), self.index, self.get_due_distance())
+
+if __name__ == "__main__":
+    print "start with 'python todoIndicator.py'"
