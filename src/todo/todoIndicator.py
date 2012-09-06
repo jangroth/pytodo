@@ -16,13 +16,16 @@ class TodoIndicator:
     def __init__(self, todoFileLocation):
         print "initializing..."
         self.todoFileLocation = todoFileLocation
+        gobject.timeout_add(10, self._refresh_all, False)
         
-    def _refresh_all(self):
+    def _refresh_all(self, silent = True):
         self.todoList = TodoList(self.todoFileLocation);
         self.ind = self._get_indicator()
         self.menu = self._create_menu()
         self.ind.set_menu(self.menu)
-        gobject.timeout_add(60000, self._refresh_all)
+        if silent == False:
+            self.todoList.print_stats()
+        gobject.timeout_add(10000, self._refresh_all)
         
     def _get_indicator(self):
         result = appindicator.Indicator("todo", "todo", appindicator.CATEGORY_APPLICATION_STATUS)
@@ -114,15 +117,13 @@ class TodoIndicator:
     
     def _update_all(self, *args):
         print "updating..."
-        self._refresh_all()
-        self.todoList.print_stats()
+        self._refresh_all(False)
     
     def _quit(self, *args):
         print "bye..."
         gtk.main_quit()
         
     def main(self):
-        gobject.timeout_add(10, self._refresh_all)
         gtk.main()
 
 if __name__ == "__main__":
