@@ -6,10 +6,8 @@ pygtk.require('2.0')
 import gtk
 import os
 import appindicator
+import gobject
 from todoList import TodoList
-
-#Parameters
-MIN_WORK_TIME = 60 * 10 # min work time in seconds
 
 class TodoIndicator:
     '''
@@ -18,14 +16,13 @@ class TodoIndicator:
     def __init__(self, todoFileLocation):
         print "initializing..."
         self.todoFileLocation = todoFileLocation
-        self._refresh_all()
         
     def _refresh_all(self):
         self.todoList = TodoList(self.todoFileLocation);
         self.ind = self._get_indicator()
         self.menu = self._create_menu()
         self.ind.set_menu(self.menu)
-        self.todoList.print_stats()
+        gobject.timeout_add(60000, self._refresh_all)
         
     def _get_indicator(self):
         result = appindicator.Indicator("todo", "todo", appindicator.CATEGORY_APPLICATION_STATUS)
@@ -36,31 +33,54 @@ class TodoIndicator:
     def _create_menu(self):
         menu = gtk.Menu()
         menu = self._append_overview_menu(menu)
-        # projects
-        for project in self.todoList.projects:
-            item = gtk.MenuItem("+" + project)
-            item.set_submenu(self._create_submenu(project = project))
-            menu.append(item)
-        menu.append(gtk.SeparatorMenuItem())
-        # contexts
-        for context in self.todoList.contexts:
-            item = gtk.MenuItem("@" + context)
-            item.set_submenu(self._create_submenu(context = context))
-            menu.append(item)
-        menu.append(gtk.SeparatorMenuItem())
-        # malformed
+        menu = self._append_project_menu(menu)
+        menu = self._append_context_menu(menu)
         menu = self._append_malformed_menu(menu)
         # update 
-        item = gtk.MenuItem('Upate')
+        item = gtk.MenuItem('Update now')
         item.connect("activate", self._update_all, None)
         menu.append(item)
         # quit
         item = gtk.MenuItem('Quit')
         item.connect("activate", self._quit, None)
         menu.append(item)
+        
         menu.show_all()
         return menu
     
+    def _append_overview_menu(self, menu):
+        dict = self.todoList.get_as_dictionary()
+        for category in dict.keys():
+            catLength = len(dict[category])
+            menuItem = gtk.MenuItem("=== %s === (%s)" % (category, catLength))
+            menuItem.set_sensitive(catLength > 0)
+            if catLength > 0: 
+                subMenu = gtk.Menu()
+                for item in sorted(dict[category], key=lambda index : index.get_sort_key()):
+                    subMenu.append(gtk.MenuItem(item.get_print_string()))
+                menuItem.set_submenu(subMenu)
+            menu.append(menuItem)
+        menu.append(gtk.SeparatorMenuItem())
+        return menu
+
+    def _append_project_menu(self, menu):
+        for project in self.todoList.projects:
+            dict = self.todoList.get_as_dictionary(project = project)
+            item = gtk.MenuItem("+%s (%s)" % (project, self._getDictLen(dict)))
+            item.set_submenu(self._create_submenu(dict))
+            menu.append(item)
+        menu.append(gtk.SeparatorMenuItem())
+        return menu
+            
+    def _append_context_menu(self, menu):
+        for context in self.todoList.contexts:
+            dict = self.todoList.get_as_dictionary(context = context)
+            item = gtk.MenuItem("@%s (%s)" % (context, self._getDictLen(dict)))
+            item.set_submenu(self._create_submenu(dict))
+            menu.append(item)
+        menu.append(gtk.SeparatorMenuItem())
+        return menu
+
     def _append_malformed_menu(self, menu):
         malformed = []
         for todo in self.todoList.todos:
@@ -76,32 +96,8 @@ class TodoIndicator:
             menu.append(gtk.SeparatorMenuItem())
         return menu
     
-    def _update_all(self, *args):
-        print "updating..."
-        self._refresh_all()
-    
-    def _quit(self, *args):
-        print "bye..."
-        gtk.main_quit()
-        
-    def _append_overview_menu(self, menu):
-        dict = self.todoList.get_as_dictionary()
-        for category in dict.keys():
-            catLength = len(dict[category])
-            menuItem = gtk.MenuItem("=== %s === (%s)" % (category, catLength))
-            menuItem.set_sensitive(catLength > 0)
-            if catLength > 0: 
-                subMenu = gtk.Menu()
-                for item in sorted(dict[category], key=lambda index : index.get_sort_key()):
-                    subMenu.append(gtk.MenuItem(item.get_print_string()))
-                menuItem.set_submenu(subMenu)
-            menu.append(menuItem)
-        menu.append(gtk.SeparatorMenuItem())
-        return menu
-                
-    def _create_submenu(self, project="", context=""):
+    def _create_submenu(self, dict):
         result = gtk.Menu()
-        dict = self.todoList.get_as_dictionary(project, context)
         for category in dict.keys():
             menuItem = gtk.MenuItem("=== %s === (%s)" % (category, len(dict[category])))
             menuItem.set_sensitive(False)
@@ -110,7 +106,23 @@ class TodoIndicator:
                 result.append(gtk.MenuItem(item.get_print_string()))
         return result
     
+    def _getDictLen(self, dict):
+        result = 0
+        for lst in dict.keys():
+            result += len(dict[lst])
+        return result
+    
+    def _update_all(self, *args):
+        print "updating..."
+        self._refresh_all()
+        self.todoList.print_stats()
+    
+    def _quit(self, *args):
+        print "bye..."
+        gtk.main_quit()
+        
     def main(self):
+        gobject.timeout_add(10, self._refresh_all)
         gtk.main()
 
 if __name__ == "__main__":

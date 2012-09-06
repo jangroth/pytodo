@@ -1,14 +1,14 @@
 x reload / update
 x plausisbility check (no project, no context, no time) -> malformed
+x automatic update every minute 
 
-automatic update every minute 
 errorhandling (no / wrong file, weired format)
-find missing @alex
-decide about on-click behaviour of items
 externalize all configs, decide about call parameters
 use constants for all strings
 externalizes tests, make suite
-change time symbol from +_? -> * (-> would break existing todo scripts) -> make configurable
+change time symbol from +_? -> * (-> would break existing todo scripts) -> make configurable?
+decide about on-click behaviour of items -> open editor & terminal
+add icons for future, current, past, msd...
 
 decide about final versions (update python to 3.x ?)
 download python source-code
