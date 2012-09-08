@@ -3,6 +3,7 @@ x plausisbility check (no project, no context, no time) -> malformed
 x automatic update every minute 
 
 errorhandling (no / wrong file, weired format)
+auto detect file from todo_path_location
 externalize all configs, decide about call parameters
 use constants for all strings
 externalizes tests, make suite

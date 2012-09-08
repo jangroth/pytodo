@@ -69,7 +69,7 @@ class TodoIndicator:
     def _append_project_menu(self, menu):
         for project in self.todoList.projects:
             dict = self.todoList.get_as_dictionary(project = project)
-            item = gtk.MenuItem("+%s (%s)" % (project, self._getDictLen(dict)))
+            item = gtk.MenuItem("+%s (%s)" % (project, sum(len(dict[lst]) for lst in dict.keys())))
             item.set_submenu(self._create_submenu(dict))
             menu.append(item)
         menu.append(gtk.SeparatorMenuItem())
@@ -78,7 +78,7 @@ class TodoIndicator:
     def _append_context_menu(self, menu):
         for context in self.todoList.contexts:
             dict = self.todoList.get_as_dictionary(context = context)
-            item = gtk.MenuItem("@%s (%s)" % (context, self._getDictLen(dict)))
+            item = gtk.MenuItem("@%s (%s)" % (context, sum(len(dict[lst]) for lst in dict.keys())))
             item.set_submenu(self._create_submenu(dict))
             menu.append(item)
         menu.append(gtk.SeparatorMenuItem())
@@ -107,12 +107,6 @@ class TodoIndicator:
             result.append(menuItem)
             for item in sorted(dict[category], key=lambda index : index.get_sort_key()):
                 result.append(gtk.MenuItem(item.get_print_string()))
-        return result
-    
-    def _getDictLen(self, dict):
-        result = 0
-        for lst in dict.keys():
-            result += len(dict[lst])
         return result
     
     def _update_all(self, *args):
