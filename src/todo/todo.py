@@ -155,7 +155,7 @@ class Todo:
         '''
         Returns a printable string representation.
         '''
-        return "(%s) - %s - +%s @%s - (%s - %s)" % (self.priority, self.goal.lower(), "-".join(a for a in self.projects), " ".join(a for a in self.contexts), self.index, self.get_due_distance())
+        return "(%s) - %s - +%s @%s - (%s - %s)" % (self.priority, self.goal.lower(), "-".join(a for a in self.projects), "-".join(a for a in self.contexts), self.index, self.get_due_distance())
 
 if __name__ == "__main__":
     print "start with 'python todoIndicator.py'"

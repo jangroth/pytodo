@@ -2,21 +2,28 @@
 from __future__ import division
 
 import pygtk
+from subprocess import Popen
 pygtk.require('2.0')
 import gtk
 import os
 import appindicator
 import gobject
+import subprocess
 from todoList import TodoList
 
 class TodoIndicator:
     '''
     GTK indicator that integrates in unity.
     '''
-    def __init__(self, todoFileLocation):
+    def __init__(self, todoFileLocation = ""):
         print "initializing..."
-        self.todoFileLocation = todoFileLocation
+        self.todoFileLocation = self._getFileLocation(todoFileLocation)
         gobject.timeout_add(10, self._refresh_all, False)
+        
+    def _getFileLocation(self, todoFileLocation):
+        if todoFileLocation == "":
+            todoFileLocation = os.environ['TODO_DIR'] + "/todo.txt"
+        return todoFileLocation
         
     def _refresh_all(self, silent = True):
         self.todoList = TodoList(self.todoFileLocation);
@@ -25,7 +32,7 @@ class TodoIndicator:
         self.ind.set_menu(self.menu)
         if silent == False:
             self.todoList.print_stats()
-        gobject.timeout_add(10000, self._refresh_all)
+        #gobject.timeout_add(10000, self._refresh_all)
         
     def _get_indicator(self):
         result = appindicator.Indicator("todo", "todo", appindicator.CATEGORY_APPLICATION_STATUS)
@@ -35,14 +42,19 @@ class TodoIndicator:
             
     def _create_menu(self):
         menu = gtk.Menu()
-        menu = self._append_overview_menu(menu)
-        menu = self._append_project_menu(menu)
-        menu = self._append_context_menu(menu)
-        menu = self._append_malformed_menu(menu)
         # update 
         item = gtk.MenuItem('Update now')
         item.connect("activate", self._update_all, None)
         menu.append(item)
+        # open file
+        item = gtk.MenuItem('Edit todo.txt')
+        item.connect("activate", self._open_file, None)
+        menu.append(item)
+        menu.append(gtk.SeparatorMenuItem())
+        menu = self._append_overview_menu(menu)
+        menu = self._append_project_menu(menu)
+        menu = self._append_context_menu(menu)
+        menu = self._append_malformed_menu(menu)
         # quit
         item = gtk.MenuItem('Quit')
         item.connect("activate", self._quit, None)
@@ -113,6 +125,10 @@ class TodoIndicator:
         print "updating..."
         self._refresh_all(False)
     
+    def _open_file(self, *args):
+        print "opening editor..."
+        Popen(["gedit", self.todoFileLocation])
+    
     def _quit(self, *args):
         print "bye..."
         gtk.main_quit()
@@ -122,3 +138,4 @@ class TodoIndicator:
 
 if __name__ == "__main__":
     TodoIndicator("/data/Dropbox/todo/todo.txt").main()
+    # TodoIndicator().main()
