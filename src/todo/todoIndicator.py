@@ -72,7 +72,7 @@ class TodoIndicator:
             if catLength > 0: 
                 subMenu = gtk.Menu()
                 for item in sorted(dict[category], key=lambda index : index.get_sort_key()):
-                    subMenu.append(gtk.MenuItem(item.get_print_string()))
+                    subMenu.append(self._get_menu_item_from_todo(item))
                 menuItem.set_submenu(subMenu)
             menu.append(menuItem)
         menu.append(gtk.SeparatorMenuItem())
@@ -118,7 +118,12 @@ class TodoIndicator:
             menuItem.set_sensitive(False)
             result.append(menuItem)
             for item in sorted(dict[category], key=lambda index : index.get_sort_key()):
-                result.append(gtk.MenuItem(item.get_print_string()))
+                result.append(self._get_menu_item_from_todo(item))
+        return result
+    
+    def _get_menu_item_from_todo(self, todo):
+        result = gtk.MenuItem(todo.get_print_string())
+        result.connect("activate", self._open_file, todo.index)
         return result
     
     def _update_all(self, *args):
@@ -127,7 +132,7 @@ class TodoIndicator:
     
     def _open_file(self, *args):
         print "opening editor..."
-        Popen(["gedit", self.todoFileLocation])
+        Popen(["gedit", self.todoFileLocation, "+%s" % (args[1])])
     
     def _quit(self, *args):
         print "bye..."
