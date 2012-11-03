@@ -10,4 +10,8 @@ Allows to use a new tag "+_" with single todos, which adds the following meaning
 Parses a todo.txt file and displays a GTK indicator (which integrates into Unity) that displays all todos nicely 
 sorted by upcoming due date and priority.
 
-12/09/5 - Code reached "works on my machine" state.
+12/09/05 - Code reached "works on my machine" state.
+12/11/04 - Works pretty good on my machine inbetween. Will suspend project for some time.
+
+Example usage: 
+	./todoIndicator.py /data/Dropbox/todo/todo.txt

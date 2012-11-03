@@ -17,9 +17,10 @@ class TodoIndicator:
     '''
     GTK indicator that integrates in unity. Will use first call argument
     as location of todo.txt file or use default location otherwise.
+    Example usage: ./todoIndicator.py /data/Dropbox/todo/todo.txt
     '''
     def __init__(self, todoFileLocation = ""):
-        print "initializing..."
+        print "parsing file..."
         self.todoFileLocation = self._getFileLocation(todoFileLocation)
         gobject.timeout_add(10, self._refresh_all, False)
         
@@ -148,5 +149,4 @@ if __name__ == "__main__":
         todoLocation = sys.argv[1]
     else:
         todoLocation = todoVarDefaultLocation
-    print "using location: %s " % (todoLocation)
     TodoIndicator(todoLocation).main()
