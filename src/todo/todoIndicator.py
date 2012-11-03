@@ -51,7 +51,7 @@ class TodoIndicator:
         menu.append(item)
         # open file
         item = gtk.MenuItem('Edit todo.txt')
-        item.connect("activate", self._open_file, None)
+        item.connect("activate", self._open_file, 1)
         menu.append(item)
         menu.append(gtk.SeparatorMenuItem())
         menu = self._append_overview_menu(menu)
@@ -135,7 +135,7 @@ class TodoIndicator:
     
     def _open_file(self, *args):
         print "opening editor..."
-        Popen(["gedit", self.todoFileLocation, "+%s" % (args[1])], stdin=open(os.devnull, 'r'))
+        Popen(["gvim", "+%s" % (args[1]), self.todoFileLocation], stdin=open(os.devnull, 'r'))
     
     def _quit(self, *args):
         print "bye..."
