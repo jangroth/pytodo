@@ -8,12 +8,15 @@ import gtk
 import os
 import appindicator
 import gobject
-import subprocess
+import sys
 from todoList import TodoList
+
+todoVarDefaultLocation = "/data/Dropbox/todo/todo.txt"
 
 class TodoIndicator:
     '''
-    GTK indicator that integrates in unity.
+    GTK indicator that integrates in unity. Will use first call argument
+    as location of todo.txt file or use default location otherwise.
     '''
     def __init__(self, todoFileLocation = ""):
         print "initializing..."
@@ -32,7 +35,6 @@ class TodoIndicator:
         self.ind.set_menu(self.menu)
         if silent == False:
             self.todoList.print_stats()
-        #gobject.timeout_add(10000, self._refresh_all)
         
     def _get_indicator(self):
         result = appindicator.Indicator("todo", "todo", appindicator.CATEGORY_APPLICATION_STATUS)
@@ -132,7 +134,7 @@ class TodoIndicator:
     
     def _open_file(self, *args):
         print "opening editor..."
-        Popen(["gedit", self.todoFileLocation, "+%s" % (args[1])])
+        Popen(["gedit", self.todoFileLocation, "+%s" % (args[1])], stdin=open(os.devnull, 'r'))
     
     def _quit(self, *args):
         print "bye..."
@@ -142,5 +144,9 @@ class TodoIndicator:
         gtk.main()
 
 if __name__ == "__main__":
-    TodoIndicator("/data/Dropbox/todo/todo.txt").main()
-    # TodoIndicator().main()
+    if len(sys.argv) > 1:
+        todoLocation = sys.argv[1]
+    else:
+        todoLocation = todoVarDefaultLocation
+    print "using location: %s " % (todoLocation)
+    TodoIndicator(todoLocation).main()

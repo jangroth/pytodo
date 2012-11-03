@@ -7,7 +7,7 @@ from todoIndicator import TodoIndicator
 todoVar = "TODO_DIR_PYTHON"
 
 def get_todo_path():
-    '''todo'''
+    '''fetch todo path from environment'''
     # return os.environ['TODO_DIR_PYTHON'] + "/todo.txt"
     # return "files/play.txt"
     return "/data/Dropbox/todo/todo.txt"
