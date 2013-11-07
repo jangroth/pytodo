@@ -63,4 +63,4 @@ class TodoList:
         print "%s contexts (%s)" % (len(self.contexts), "-".join(a for a in self.contexts))
 
 if __name__ == "__main__":
-    print "start with 'python todoIndicator.py'"
+    print "run todoIndicator.py"
