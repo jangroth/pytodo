@@ -12,7 +12,7 @@ import sys
 
 from todoList import TodoList
 
-todoVarDefaultLocation = "/data/Dropbox/documents/todo.txt"
+defaultFileLocation = "/data/Dropbox/documents/todo.txt"
 
 class TodoIndicator:
     '''
@@ -20,17 +20,13 @@ class TodoIndicator:
 
     Example usage: ./todoIndicator.py TODO_FILE_LOCATION
 
-    If no argument is provided a default location will be used.
+    If no value for TODO_FILE_LOCATION is provided, a file named 'todo.txt' will be
+    loaded from the directory specified in the environment variable TODO_DIR. If this
+    variable does not exist, the file will be loaded from a hard coded default location.
     '''
-    def __init__(self, todoFileLocation = ""):
-        print "parsing file..."
-        self.todoFileLocation = self._getFileLocation(todoFileLocation)
+    def __init__(self, todoFileLocation):
+        self.todoFileLocation = todoFileLocation
         gobject.timeout_add(10, self._refresh_all, False)
-
-    def _getFileLocation(self, todoFileLocation):
-        if todoFileLocation == "":
-            todoFileLocation = os.environ['TODO_DIR'] + "/todo.txt"
-        return todoFileLocation
 
     def _refresh_all(self, silent = True):
         self.todoList = TodoList(self.todoFileLocation);
@@ -147,8 +143,9 @@ class TodoIndicator:
         gtk.main()
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        todoLocation = sys.argv[1]
-    else:
-        todoLocation = todoVarDefaultLocation
-    TodoIndicator(todoLocation).main()
+    fileLocation = defaultFileLocation
+    if len(sys.argv) >= 2:
+        fileLocation = sys.argv[1]
+    elif 'TODO_DIR' in os.environ:
+        fileLocation = os.environ['TODO_DIR'] + "/todo.txt"
+    TodoIndicator(fileLocation).main()
