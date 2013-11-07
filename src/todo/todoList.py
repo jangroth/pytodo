@@ -8,7 +8,7 @@ class TodoList:
     def __init__(self, filePath):
         self.filePath = filePath
         self.refresh()
-    
+
     def _read_todos(self, filePath):
         '''
         Returns all lines of the given todo.txt file.
@@ -17,7 +17,7 @@ class TodoList:
         allLines = todoFile.readlines()
         todoFile.close()
         return allLines
-    
+
     def refresh(self):
         '''
         (re-)loads and parses list of todos.
@@ -32,7 +32,7 @@ class TodoList:
             self.todos.append(todo)
             self.projects = self.projects.union(todo.projects)
             self.contexts = self.contexts.union(todo.contexts)
-    
+
     def get_as_dictionary(self, project="", context="", comparisonDate=datetime.date.today()):
         '''
         Returns fixed dictionary of time category (key) and todo (value), uses filter if provided. 
@@ -42,7 +42,7 @@ class TodoList:
             if todo.matches_project_or_context(project, context):
                 result[todo.get_category(comparisonDate)].append(todo)
         return result
-    
+
     def print_as_dictionary(self, project="", context="", comparisonDate=datetime.date.today()):
         '''
         Prints dictionary of time category (key) and todo list (value), uses filter if provided. Mainly 
@@ -53,7 +53,7 @@ class TodoList:
             print "============= %s =============" % (category)
             for item in sorted(dict[category], key=lambda index : index.get_sort_key()):
                 print "%s" % item.get_print_string()
-                
+
     def print_stats(self):
         '''
         Prints basic statistic about list of todos.
@@ -61,6 +61,6 @@ class TodoList:
         print "Found %s todos at %s" % (len(self.todos), self.filePath)
         print "%s projects (%s)" % (len(self.projects), "-".join(a for a in self.projects))
         print "%s contexts (%s)" % (len(self.contexts), "-".join(a for a in self.contexts))
- 
+
 if __name__ == "__main__":
-    print "start with 'python todoIndicator.py'"   
+    print "start with 'python todoIndicator.py'"

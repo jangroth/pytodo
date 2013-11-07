@@ -1,34 +1,37 @@
 #!/usr/bin/env python
-from __future__ import division
 
-import pygtk
+from __future__ import division
 from subprocess import Popen
+import pygtk
 pygtk.require('2.0')
 import gtk
 import os
 import appindicator
 import gobject
 import sys
+
 from todoList import TodoList
 
-todoVarDefaultLocation = "/data/Dropbox/todo/todo.txt"
+todoVarDefaultLocation = "/data/Dropbox/documents/todo.txt"
 
 class TodoIndicator:
     '''
-    GTK indicator that integrates in unity. Will use first call argument
-    as location of todo.txt file or use default location otherwise.
-    Example usage: ./todoIndicator.py /data/Dropbox/todo/todo.txt
+    GTK indicator that integrates in Unity.
+
+    Example usage: ./todoIndicator.py TODO_FILE_LOCATION
+
+    If no argument is provided a default location will be used.
     '''
     def __init__(self, todoFileLocation = ""):
         print "parsing file..."
         self.todoFileLocation = self._getFileLocation(todoFileLocation)
         gobject.timeout_add(10, self._refresh_all, False)
-        
+
     def _getFileLocation(self, todoFileLocation):
         if todoFileLocation == "":
             todoFileLocation = os.environ['TODO_DIR'] + "/todo.txt"
         return todoFileLocation
-        
+
     def _refresh_all(self, silent = True):
         self.todoList = TodoList(self.todoFileLocation);
         self.ind = self._get_indicator()
@@ -36,16 +39,16 @@ class TodoIndicator:
         self.ind.set_menu(self.menu)
         if silent == False:
             self.todoList.print_stats()
-        
+
     def _get_indicator(self):
         result = appindicator.Indicator("todo", "todo", appindicator.CATEGORY_APPLICATION_STATUS)
         result.set_status (appindicator.STATUS_ACTIVE)
         result.set_icon(os.path.dirname(os.path.realpath(__file__)) + os.path.sep + "todo.png")
         return result
-            
+
     def _create_menu(self):
         menu = gtk.Menu()
-        # update 
+        # update
         item = gtk.MenuItem('Update now')
         item.connect("activate", self._update_all, None)
         menu.append(item)
@@ -62,17 +65,16 @@ class TodoIndicator:
         item = gtk.MenuItem('Quit')
         item.connect("activate", self._quit, None)
         menu.append(item)
-        
         menu.show_all()
         return menu
-    
+
     def _append_overview_menu(self, menu):
         dict = self.todoList.get_as_dictionary()
         for category in dict.keys():
             catLength = len(dict[category])
             menuItem = gtk.MenuItem("=== %s === (%s)" % (category, catLength))
             menuItem.set_sensitive(catLength > 0)
-            if catLength > 0: 
+            if catLength > 0:
                 subMenu = gtk.Menu()
                 for item in sorted(dict[category], key=lambda index : index.get_sort_key()):
                     subMenu.append(self._get_menu_item_from_todo(item))
@@ -89,7 +91,7 @@ class TodoIndicator:
             menu.append(item)
         menu.append(gtk.SeparatorMenuItem())
         return menu
-            
+
     def _append_context_menu(self, menu):
         for context in self.todoList.contexts:
             dict = self.todoList.get_as_dictionary(context = context)
@@ -107,13 +109,13 @@ class TodoIndicator:
         if len(malformed) > 0:
             item = gtk.MenuItem("malformed (%s)" % (len(malformed)))
             subMenu = gtk.Menu()
-            for malItem in malformed:            
+            for malItem in malformed:
                 subMenu.append(malItem)
             item.set_submenu(subMenu)
-            menu.append(item)    
+            menu.append(item)
             menu.append(gtk.SeparatorMenuItem())
         return menu
-    
+
     def _create_submenu(self, dict):
         result = gtk.Menu()
         for category in dict.keys():
@@ -123,29 +125,29 @@ class TodoIndicator:
             for item in sorted(dict[category], key=lambda index : index.get_sort_key()):
                 result.append(self._get_menu_item_from_todo(item))
         return result
-    
+
     def _get_menu_item_from_todo(self, todo):
         result = gtk.MenuItem(todo.get_print_string())
         result.connect("activate", self._open_file, todo.index)
         return result
-    
+
     def _update_all(self, *args):
         print "updating..."
         self._refresh_all(False)
-    
+
     def _open_file(self, *args):
         print "opening editor..."
         Popen(["gvim", "+%s" % (args[1]), self.todoFileLocation], stdin=open(os.devnull, 'r'))
-    
+
     def _quit(self, *args):
         print "bye..."
         gtk.main_quit()
-        
+
     def main(self):
         gtk.main()
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
+    if len(sys.argv) == 2:
         todoLocation = sys.argv[1]
     else:
         todoLocation = todoVarDefaultLocation
