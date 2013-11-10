@@ -28,10 +28,11 @@ class TodoList:
         self.contexts = set()
         for index, item in enumerate(self.rawLines):
             item = item[0:len(item) - 1]
-            todo = Todo(item, index + 1)
-            self.todos.append(todo)
-            self.projects = self.projects.union(todo.projects)
-            self.contexts = self.contexts.union(todo.contexts)
+            if (len(item) > 0):
+                todo = Todo(item, index + 1)
+                self.todos.append(todo)
+                self.projects = self.projects.union(todo.projects)
+                self.contexts = self.contexts.union(todo.contexts)
 
     def get_as_dictionary(self, project="", context="", comparisonDate=datetime.date.today()):
         '''
