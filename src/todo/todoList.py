@@ -28,7 +28,7 @@ class TodoList:
         self.contexts = set()
         for index, item in enumerate(self.rawLines):
             item = item[0:len(item) - 1]
-            if (len(item) > 0):
+            if (len(item) > 0 and item[0]!='#'):
                 todo = Todo(item, index + 1)
                 self.todos.append(todo)
                 self.projects = self.projects.union(todo.projects)
