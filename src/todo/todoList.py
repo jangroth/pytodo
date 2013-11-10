@@ -54,6 +54,14 @@ class TodoList:
             for item in sorted(dict[category], key=lambda index : index.get_sort_key()):
                 print "%s" % item.get_print_string()
 
+    def openTodosForContext(self, ctx):
+        context_as_dictonary = self.get_as_dictionary(context = ctx)
+        return sum(len(context_as_dictonary[lst]) for lst in context_as_dictonary.keys())
+
+    def openTodosForProject(self, prj):
+        project_as_dictonary = self.get_as_dictionary(project = prj)
+        return sum(len(project_as_dictonary[lst]) for lst in project_as_dictonary.keys())
+
     def print_stats(self):
         '''
         Prints basic statistic about list of todos.
