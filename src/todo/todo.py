@@ -113,6 +113,13 @@ class Todo:
                 result = testDate - comparisonDate
             result = result.days
         return result
+
+    def get_formatted_due_distance(self):
+        result = ""
+        distance = self.get_due_distance()
+        if distance > 0:
+            result = " (...{0}d)".format(distance)
+        return result
     
     def get_category(self, comparisonDate=datetime.date.today()):
         '''
@@ -155,7 +162,7 @@ class Todo:
         '''
         Returns a printable string representation.
         '''
-        return "(%s) - %s - +%s @%s - (%s - %s)" % (self.priority, self.goal.lower(), "-".join(a for a in self.projects), "-".join(a for a in self.contexts), self.index, self.get_due_distance())
+        return "(%s) - %s - +%s @%s %s" % (self.priority, self.goal.lower(), "-".join(a for a in self.projects), "-".join(a for a in self.contexts), self.get_formatted_due_distance())
 
 if __name__ == "__main__":
     print "run todoIndicator.py"
